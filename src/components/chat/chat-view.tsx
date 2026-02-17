@@ -2,9 +2,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { useChatStore } from '@/stores/chat-store';
 import { useAgentStore } from '@/stores/agent-store';
 import { useChat } from '@/hooks/use-chat';
@@ -39,13 +37,8 @@ export function ChatView() {
     const el = scrollRef.current;
     if (!el) return;
     const threshold = 100;
-    const scrollContainer = el.querySelector('[data-slot="scroll-area-viewport"]');
-    if (!scrollContainer) return;
     isNearBottomRef.current =
-      scrollContainer.scrollHeight -
-        scrollContainer.scrollTop -
-        scrollContainer.clientHeight <
-      threshold;
+      el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
   }, []);
 
   useEffect(() => {
@@ -149,10 +142,10 @@ export function ChatView() {
       {!hasMessages ? (
         <WelcomeScreen agent={agent} onSendSuggestion={handleSend} />
       ) : (
-        <ScrollArea
+        <div
           ref={scrollRef}
-          className="flex-1"
-          onScrollCapture={checkIfNearBottom}
+          className="flex-1 overflow-y-auto"
+          onScroll={checkIfNearBottom}
         >
           <div className="mx-auto max-w-3xl py-4">
             <AnimatePresence mode="popLayout">
@@ -178,7 +171,7 @@ export function ChatView() {
             </AnimatePresence>
             <div ref={bottomRef} className="h-px" />
           </div>
-        </ScrollArea>
+        </div>
       )}
 
       {/* Input area */}
