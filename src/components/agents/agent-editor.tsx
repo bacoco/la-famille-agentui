@@ -34,11 +34,11 @@ import type { Agent, AgentCreate } from '@/types/agent';
 
 /** Maps model aliases to their underlying LLM (from openclaw.template.json). */
 const MODEL_LABELS: Record<string, string> = {
-  maman: 'claude-opus-4-5 (Anthropic)',
-  henry: 'glm-4.7 (Z.AI)',
-  sage: 'gemini-3-pro-preview (Google)',
-  nova: 'gpt-5.2 (OpenAI Codex)',
-  blaise: 'gpt-5.2 (OpenAI Codex)',
+  maman: 'Claude Opus 4 (Anthropic)',
+  henry: 'GLM-4.7 (Z.AI)',
+  sage: 'Gemini 2.5 Pro (Google)',
+  nova: 'GPT-5.3-Codex (OpenAI)',
+  blaise: 'Claude Opus 4.6 (Anthropic)',
 };
 
 function getModelLabel(model: string): string {

@@ -20,8 +20,8 @@ interface BackendState {
 const DEFAULT_BACKEND: APIBackend = {
   id: 'family-api',
   name: 'Family API (OpenClaw)',
-  baseUrl: 'http://100.123.165.124:51586/v1',
-  authToken: 'eRQGChDjuoyfM5tnnoJc2nR7RLe5zA88',
+  baseUrl: 'http://100.123.165.124:3100/v1',
+  authToken: 'ZCUjBI188lAxQxNhk3bBrZB76UzZmZwp',
   isDefault: true,
   models: ['maman', 'henry', 'sage', 'nova', 'blaise'],
   healthStatus: 'unknown',
@@ -91,6 +91,21 @@ export const useBackendStore = create<BackendState>()(
         }));
       },
     }),
-    { name: 'agentui-backends' }
+    {
+      name: 'agentui-backends',
+      version: 1,
+      migrate: (persisted: unknown, version: number) => {
+        const state = persisted as { backends: APIBackend[] };
+        if (version === 0 && state?.backends) {
+          // Migrate from gateway (51586) to family-api (3100)
+          state.backends = state.backends.map((b) =>
+            b.id === 'family-api'
+              ? { ...b, baseUrl: DEFAULT_BACKEND.baseUrl, authToken: DEFAULT_BACKEND.authToken }
+              : b
+          );
+        }
+        return state;
+      },
+    }
   )
 );
