@@ -32,13 +32,13 @@ import { useBackendStore } from '@/stores/backend-store';
 import { getPresetAgents } from '@/config/presets';
 import type { Agent, AgentCreate } from '@/types/agent';
 
-/** Maps model aliases to their underlying LLM for display purposes. */
+/** Maps model aliases to their underlying LLM (from openclaw.template.json). */
 const MODEL_LABELS: Record<string, string> = {
-  maman: 'claude-opus-4-6 (Anthropic)',
+  maman: 'claude-opus-4-5 (Anthropic)',
   henry: 'glm-4.7 (Z.AI)',
   sage: 'gemini-3-pro-preview (Google)',
-  nova: 'gpt-5.3-codex (OpenAI)',
-  blaise: 'gpt-5.2 (OpenAI)',
+  nova: 'gpt-5.2 (OpenAI Codex)',
+  blaise: 'gpt-5.2 (OpenAI Codex)',
 };
 
 function getModelLabel(model: string): string {
