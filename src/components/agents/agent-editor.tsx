@@ -62,6 +62,8 @@ export function AgentEditor({ agent, onSave, onDelete }: AgentEditorProps) {
   const removeAgent = useAgentStore((s) => s.removeAgent);
   const backends = useBackendStore((s) => s.backends);
 
+  const getBackend = useBackendStore((s) => s.getBackend);
+
   const isEditing = !!agent;
   const isPreset = agent?.isPreset ?? false;
 
@@ -83,6 +85,9 @@ export function AgentEditor({ agent, onSave, onDelete }: AgentEditorProps) {
     }
     return { ...defaultValues, personality: { ...defaultValues.personality } };
   });
+
+  const selectedBackend = getBackend(form.backendId);
+  const selectedBackendModels = selectedBackend?.models || [];
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -292,12 +297,30 @@ export function AgentEditor({ agent, onSave, onDelete }: AgentEditorProps) {
           </div>
           <div>
             <Label htmlFor="model">Model</Label>
-            <Input
-              id="model"
-              value={form.model}
-              onChange={(e) => updateField('model', e.target.value)}
-              placeholder="Model name"
-            />
+            {selectedBackendModels.length > 0 ? (
+              <Select
+                value={form.model}
+                onValueChange={(v) => updateField('model', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedBackendModels.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="model"
+                value={form.model}
+                onChange={(e) => updateField('model', e.target.value)}
+                placeholder="Model name (e.g. maman, henry)"
+              />
+            )}
           </div>
         </div>
       </section>
