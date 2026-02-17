@@ -94,15 +94,11 @@ export function ChatView() {
 
   const handleAgentSelect = useCallback(
     (agentId: string) => {
-      if (!activeConversationId) {
-        // Create new conversation with this agent
-        const convId = createConversation(agentId);
-        setActiveConversation(convId);
-      }
-      // If there's an active conversation and we switch agents, just note it
-      // The user will start a new conversation with the new agent
+      // Always create a new conversation with the selected agent
+      const convId = createConversation(agentId);
+      setActiveConversation(convId);
     },
-    [activeConversationId, createConversation, setActiveConversation]
+    [createConversation, setActiveConversation]
   );
 
   const hasMessages = messages.length > 0;
