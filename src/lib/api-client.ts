@@ -23,28 +23,34 @@ export interface ChatCompletionResponse {
 }
 
 /**
+ * Build headers that tell our proxy where to forward the request.
+ */
+function proxyHeaders(backend: APIBackend, endpoint: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'X-Backend-Url': backend.baseUrl,
+    'X-Backend-Endpoint': endpoint,
+  };
+  if (backend.authToken) {
+    headers['X-Backend-Token'] = backend.authToken;
+  }
+  return headers;
+}
+
+/**
  * Send a non-streaming chat completion request.
  */
 export async function chatCompletion(
   backend: APIBackend,
   request: ChatCompletionRequest
 ): Promise<ChatCompletionResponse> {
-  const url = `${backend.baseUrl}/chat/completions`;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (backend.authToken) {
-    headers['Authorization'] = `Bearer ${backend.authToken}`;
-  }
-
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), backend.timeoutMs);
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch('/api/proxy', {
       method: 'POST',
-      headers,
+      headers: proxyHeaders(backend, '/chat/completions'),
       body: JSON.stringify({ ...request, stream: false }),
       signal: controller.signal,
     });
@@ -71,20 +77,9 @@ export async function chatCompletionStream(
   request: ChatCompletionRequest,
   signal?: AbortSignal
 ): Promise<Response> {
-  const url = `${backend.baseUrl}/chat/completions`;
-
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (backend.authToken) {
-    headers['Authorization'] = `Bearer ${backend.authToken}`;
-  }
-
-  // Combine user-provided abort signal with timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), backend.timeoutMs);
 
-  // If the caller provides a signal, forward its abort to our controller
   if (signal) {
     if (signal.aborted) {
       controller.abort();
@@ -94,9 +89,9 @@ export async function chatCompletionStream(
   }
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch('/api/proxy', {
       method: 'POST',
-      headers,
+      headers: proxyHeaders(backend, '/chat/completions'),
       body: JSON.stringify({ ...request, stream: true }),
       signal: controller.signal,
     });
@@ -108,10 +103,7 @@ export async function chatCompletionStream(
       );
     }
 
-    // Clear the timeout once we start receiving the stream -- the connection
-    // is alive and the SSE consumer will handle further timeouts or aborts.
     clearTimeout(timeoutId);
-
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
@@ -121,18 +113,20 @@ export async function chatCompletionStream(
 
 /**
  * Check the health of a backend by hitting its /health endpoint.
- * The base URL is expected to end with /v1, so we strip that for the health check.
  */
 export async function checkHealth(backend: APIBackend): Promise<boolean> {
   const baseWithoutVersion = backend.baseUrl.replace(/\/v1\/?$/, '');
-  const url = `${baseWithoutVersion}/health`;
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch(url, {
+    const response = await fetch('/api/proxy', {
       method: 'GET',
+      headers: {
+        'X-Backend-Url': baseWithoutVersion,
+        'X-Backend-Endpoint': '/health',
+      },
       signal: controller.signal,
     });
 
@@ -147,18 +141,19 @@ export async function checkHealth(backend: APIBackend): Promise<boolean> {
  * List available models from a backend.
  */
 export async function listModels(backend: APIBackend): Promise<string[]> {
-  const url = `${backend.baseUrl}/models`;
-
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {
+    'X-Backend-Url': backend.baseUrl,
+    'X-Backend-Endpoint': '/models',
+  };
   if (backend.authToken) {
-    headers['Authorization'] = `Bearer ${backend.authToken}`;
+    headers['X-Backend-Token'] = backend.authToken;
   }
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch(url, {
+    const response = await fetch('/api/proxy', {
       method: 'GET',
       headers,
       signal: controller.signal,
@@ -172,7 +167,6 @@ export async function listModels(backend: APIBackend): Promise<string[]> {
 
     const data = await response.json();
 
-    // OpenAI-compatible format: { data: [{ id: "model-name", ... }, ...] }
     if (data?.data && Array.isArray(data.data)) {
       return data.data.map((m: { id: string }) => m.id);
     }

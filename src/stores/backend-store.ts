@@ -19,8 +19,9 @@ interface BackendState {
 
 const DEFAULT_BACKEND: APIBackend = {
   id: 'family-api',
-  name: 'Family API',
-  baseUrl: 'http://localhost:3100/v1',
+  name: 'Family API (OpenClaw)',
+  baseUrl: 'http://100.123.165.124:51586/v1',
+  authToken: 'eRQGChDjuoyfM5tnnoJc2nR7RLe5zA88',
   isDefault: true,
   models: ['maman', 'henry', 'sage', 'nova', 'blaise'],
   healthStatus: 'unknown',
