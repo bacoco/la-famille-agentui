@@ -57,6 +57,7 @@ export default function AgentsPage() {
         </div>
 
         <motion.div
+          key={agents.length}
           variants={container}
           initial="hidden"
           animate="show"
