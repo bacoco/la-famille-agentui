@@ -32,6 +32,20 @@ import { useBackendStore } from '@/stores/backend-store';
 import { getPresetAgents } from '@/config/presets';
 import type { Agent, AgentCreate } from '@/types/agent';
 
+/** Maps model aliases to their underlying LLM for display purposes. */
+const MODEL_LABELS: Record<string, string> = {
+  maman: 'Qwen3-30B-A3B',
+  henry: 'GLM-4.7 (Z.AI)',
+  sage: 'Gemini 3 Pro Preview',
+  nova: 'GPT-5.3-Codex',
+  blaise: 'Claude Opus 4.6',
+};
+
+function getModelLabel(model: string): string {
+  const llm = MODEL_LABELS[model];
+  return llm ? `${model} — ${llm}` : model;
+}
+
 interface AgentEditorProps {
   agent?: Agent;
   onSave?: () => void;
@@ -303,12 +317,14 @@ export function AgentEditor({ agent, onSave, onDelete }: AgentEditorProps) {
                 onValueChange={(v) => updateField('model', v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select model" />
+                  <SelectValue placeholder="Select model">
+                    {form.model ? getModelLabel(form.model) : 'Select model'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {selectedBackendModels.map((m) => (
                     <SelectItem key={m} value={m}>
-                      {m}
+                      {getModelLabel(m)}
                     </SelectItem>
                   ))}
                 </SelectContent>
