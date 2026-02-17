@@ -87,12 +87,15 @@ function ConversationItem({
       exit={{ opacity: 0, x: -12, height: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={onClick}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          'group relative flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150',
+          'group relative flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-150 cursor-pointer',
           isActive
             ? 'bg-muted/80 text-foreground'
             : 'text-muted-foreground hover:bg-muted/40 hover:text-foreground'
@@ -180,7 +183,7 @@ function ConversationItem({
         {conversation.isPinned && !isHovered && (
           <Pin className="h-3 w-3 shrink-0 text-muted-foreground/50" />
         )}
-      </button>
+      </div>
     </motion.div>
   );
 }
