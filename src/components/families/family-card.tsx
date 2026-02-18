@@ -1,9 +1,10 @@
 'use client';
 
-import { Users } from 'lucide-react';
+import { Users, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AgentAvatar } from '@/components/agents/agent-avatar';
 import { useAgentStore } from '@/stores/agent-store';
+import { useBackendStore } from '@/stores/backend-store';
 import type { Family } from '@/types/family';
 
 interface FamilyCardProps {
@@ -14,10 +15,16 @@ interface FamilyCardProps {
 
 export function FamilyCard({ family, onClick, className }: FamilyCardProps) {
   const agents = useAgentStore((s) => s.agents);
+  const backends = useBackendStore((s) => s.backends);
 
   const memberAgents = family.members
     .map((m) => agents.find((a) => a.id === m.agentId))
     .filter(Boolean);
+
+  // Find the backend used by the first member agent
+  const primaryAgent = memberAgents[0];
+  const backend = primaryAgent ? backends.find((b) => b.id === primaryAgent.backendId) : undefined;
+  const healthStatus = backend?.healthStatus;
 
   return (
     <button
@@ -39,6 +46,16 @@ export function FamilyCard({ family, onClick, className }: FamilyCardProps) {
             <span>
               {family.members.length} member{family.members.length !== 1 ? 's' : ''}
             </span>
+            {healthStatus && healthStatus !== 'unknown' && (
+              <>
+                <span className="text-border">|</span>
+                <Circle className={cn(
+                  'size-2 fill-current',
+                  healthStatus === 'healthy' && 'text-green-500',
+                  healthStatus === 'unhealthy' && 'text-red-500'
+                )} />
+              </>
+            )}
           </div>
         </div>
       </div>

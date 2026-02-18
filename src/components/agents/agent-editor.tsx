@@ -39,6 +39,7 @@ const MODEL_LABELS: Record<string, string> = {
   sage: 'Gemini 2.5 Pro (Google)',
   nova: 'GPT-5.3-Codex (OpenAI)',
   blaise: 'Claude Opus 4.6 (Anthropic)',
+  biblio: 'GLM-4.7 (Z.AI)',
 };
 
 function getModelLabel(model: string): string {

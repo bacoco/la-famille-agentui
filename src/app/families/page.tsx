@@ -9,6 +9,7 @@ import { FamilyCard } from '@/components/families/family-card';
 import { useFamilyStore } from '@/stores/family-store';
 import { useAgentStore } from '@/stores/agent-store';
 import { getPresetAgents } from '@/config/presets';
+import { useBackendHealth } from '@/hooks/useBackendHealth';
 
 const container = {
   hidden: { opacity: 0 },
@@ -27,6 +28,8 @@ export default function FamiliesPage() {
   const router = useRouter();
   const families = useFamilyStore((s) => s.families);
   const initializePresets = useAgentStore((s) => s.initializePresets);
+
+  useBackendHealth();
 
   useEffect(() => {
     initializePresets(getPresetAgents());

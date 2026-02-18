@@ -12,6 +12,7 @@ import {
   Settings,
   MessageSquare,
   PinOff,
+  Sprout,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn, formatRelativeTime, truncate } from '@/lib/utils';
@@ -29,6 +30,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+import { UserMenu } from '@/components/auth/user-menu';
 
 function groupConversations(conversations: Conversation[]) {
   const now = new Date();
@@ -295,6 +297,7 @@ export function ChatSidebar() {
   const navItems = [
     { icon: Bot, label: 'Agents', href: '/agents' },
     { icon: Users, label: 'Families', href: '/families' },
+    { icon: Sprout, label: 'Genesis', href: '/genesis' },
     { icon: Settings, label: 'Settings', href: '/settings' },
   ];
 
@@ -419,6 +422,9 @@ export function ChatSidebar() {
             <span>{item.label}</span>
           </button>
         ))}
+
+        <Separator className="my-1.5 opacity-50" />
+        <UserMenu />
 
         <div className="mt-1 flex items-center justify-between px-3 py-1">
           <span className="text-[10px] text-muted-foreground/40">

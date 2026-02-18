@@ -1,5 +1,7 @@
 import { APIBackend } from '@/types/backend';
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 export interface ChatCompletionRequest {
   model: string;
   messages: { role: string; content: string }[];
@@ -48,7 +50,7 @@ export async function chatCompletion(
   const timeoutId = setTimeout(() => controller.abort(), backend.timeoutMs);
 
   try {
-    const response = await fetch('/api/proxy', {
+    const response = await fetch(`${BASE_PATH}/api/proxy`, {
       method: 'POST',
       headers: proxyHeaders(backend, '/chat/completions'),
       body: JSON.stringify({ ...request, stream: false }),
@@ -89,7 +91,7 @@ export async function chatCompletionStream(
   }
 
   try {
-    const response = await fetch('/api/proxy', {
+    const response = await fetch(`${BASE_PATH}/api/proxy`, {
       method: 'POST',
       headers: proxyHeaders(backend, '/chat/completions'),
       body: JSON.stringify({ ...request, stream: true }),
@@ -121,7 +123,7 @@ export async function checkHealth(backend: APIBackend): Promise<boolean> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const response = await fetch('/api/proxy', {
+    const response = await fetch(`${BASE_PATH}/api/proxy`, {
       method: 'GET',
       headers: {
         'X-Backend-Url': baseWithoutVersion,
@@ -153,7 +155,7 @@ export async function listModels(backend: APIBackend): Promise<string[]> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-    const response = await fetch('/api/proxy', {
+    const response = await fetch(`${BASE_PATH}/api/proxy`, {
       method: 'GET',
       headers,
       signal: controller.signal,

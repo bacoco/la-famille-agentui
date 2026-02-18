@@ -23,7 +23,7 @@ const DEFAULT_BACKEND: APIBackend = {
   baseUrl: 'http://100.123.165.124:3100/v1',
   authToken: 'ZCUjBI188lAxQxNhk3bBrZB76UzZmZwp',
   isDefault: true,
-  models: ['maman', 'henry', 'sage', 'nova', 'blaise'],
+  models: ['maman', 'henry', 'sage', 'nova', 'blaise', 'biblio'],
   healthStatus: 'unknown',
   timeoutMs: 120000,
 };
